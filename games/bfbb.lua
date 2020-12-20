@@ -38,7 +38,7 @@ function BFBB:init(options)
   self.addrs = addrs
   
   addrs["globals"] = start + 0x3C0558
-  --addrs["globals.pad0"] = addrs["globals"] + 0x31C
+  addrs["globals.pad0"] = addrs["globals"] + 0x31C
   addrs["globals.player"] = addrs["globals"] + 0x6E0
   addrs["globals.player.ent"] = addrs["globals.player"] + 0
   addrs["globals.player.ent.model"] = addrs["globals.player.ent"] + 0x24
@@ -58,10 +58,10 @@ function BFBB:init(options)
   addrs["sPadData"] = start + 0x292620
   addrs["sPadData[0].button"] = addrs["sPadData"] + 0
   addrs["sPadData[0].button 2"] = addrs["sPadData"] + 1
-  addrs["sPadData[0].stickX"] = addrs["sPadData"] + 2
-  addrs["sPadData[0].stickY"] = addrs["sPadData"] + 3
-  addrs["sPadData[0].substickX"] = addrs["sPadData"] + 4
-  addrs["sPadData[0].substickY"] = addrs["sPadData"] + 5
+  -- addrs["sPadData[0].stickX"] = addrs["sPadData"] + 2
+  -- addrs["sPadData[0].stickY"] = addrs["sPadData"] + 3
+  -- addrs["sPadData[0].substickX"] = addrs["sPadData"] + 4
+  -- addrs["sPadData[0].substickY"] = addrs["sPadData"] + 5
   addrs["sPadData[0].triggerLeft"] = addrs["sPadData"] + 6
   addrs["sPadData[0].triggerRight"] = addrs["sPadData"] + 7
 end
@@ -71,7 +71,10 @@ function BFBB:toCEAddress(dolphinAddr)
 end
 
 function BFBB:updateAddresses()
-  --self.addrs["globals.pad0->on"] = nil
+  self.addrs["globals.pad0->analog1.x"] = nil
+  self.addrs["globals.pad0->analog1.y"] = nil
+  self.addrs["globals.pad0->analog2.x"] = nil
+  self.addrs["globals.pad0->analog2.y"] = nil
   self.addrs["globals.player.ent.model->Mat"] = nil
   self.addrs["globals.player.ent.model->Mat->pos.x"] = nil
   self.addrs["globals.player.ent.model->Mat->pos.y"] = nil
@@ -81,13 +84,16 @@ function BFBB:updateAddresses()
   self.addrs["globals.player.ent.frame->vel.z"] = nil
   self.addrs["globals.player.ent.frame->rot.angle"] = nil
 
-  --local pad0 = utils.readIntBE(self.addrs["globals.pad0"])
+  local pad0 = utils.readIntBE(self.addrs["globals.pad0"])
 
-  --if pad0 ~= 0 then
-  --  pad0 = self:toCEAddress(pad0)
-  --  self.addrs["globals.pad0->on"] = pad0 + 0x2C
-  --end
-  
+  if pad0 ~= 0 then
+    pad0 = self:toCEAddress(pad0)
+    self.addrs["globals.pad0->analog1.x"] = pad0 + 0x38
+    self.addrs["globals.pad0->analog1.y"] = pad0 + 0x39
+    self.addrs["globals.pad0->analog2.x"] = pad0 + 0x3A
+    self.addrs["globals.pad0->analog2.y"] = pad0 + 0x3B
+  end
+
   local model = utils.readIntBE(self.addrs["globals.player.ent.model"])
 
   if model ~= 0 then
@@ -154,21 +160,38 @@ function value(label, offset, typeMixinClass, safeToRead, extraArgs)
   return MV(label, offset, BFBBValue, typeMixinClass, extraArgs)
 end
 
-local StickValue = subclass(BFBBValue)
-BFBB.StickValue = StickValue
+local StickXValue = subclass(BFBBValue)
+BFBB.StickXValue = StickXValue
 
-function StickValue:get()
-  return BFBBValue.get(self) * 2 + 128
+function StickXValue:get()
+  return 128 + BFBBValue.get(self)
 end
 
-function stickvalue(label, offset, safeToRead, extraArgs)
+function stickxvalue(label, offset, safeToRead, extraArgs)
   if extraArgs == nil then
     extraArgs = {}
   end
 
   extraArgs.safeToRead = safeToRead
 
-  return MV(label, offset, StickValue, SByteType, extraArgs)
+  return MV(label, offset, StickXValue, SByteType, extraArgs)
+end
+
+local StickYValue = subclass(BFBBValue)
+BFBB.StickYValue = StickYValue
+
+function StickYValue:get()
+  return 128 - BFBBValue.get(self)
+end
+
+function stickyvalue(label, offset, safeToRead, extraArgs)
+  if extraArgs == nil then
+    extraArgs = {}
+  end
+
+  extraArgs.safeToRead = safeToRead
+
+  return MV(label, offset, StickYValue, SByteType, extraArgs)
 end
 
 function playerEntSafeToRead(value)
@@ -192,10 +215,14 @@ GV.facingAngle = value("Facing angle", "globals.player.ent.frame->rot.angle", Fl
 GV.hansState = value("Hans State", "oob_state::shared::flags", SIntType)
 GV.ABXYS = value("ABXY & Start", "sPadData[0].button", BinaryType, nil, {binarySize=8, binaryStartBit=7})
 GV.DZ = value("D-Pad & Z", "sPadData[0].button 2", BinaryType, nil, {binarySize=8, binaryStartBit=7})
-GV.stickX = stickvalue("X Stick", "sPadData[0].stickX")
-GV.stickY = stickvalue("Y Stick", "sPadData[0].stickY")
-GV.xCStick = stickvalue("X C-Stick", "sPadData[0].substickX")
-GV.yCStick = stickvalue("Y C-Stick", "sPadData[0].substickY")
+-- GV.stickX = stickxvalue("X Stick", "sPadData[0].stickX")
+-- GV.stickY = stickyvalue("Y Stick", "sPadData[0].stickY")
+-- GV.xCStick = stickxvalue("X C-Stick", "sPadData[0].substickX")
+-- GV.yCStick = stickyvalue("Y C-Stick", "sPadData[0].substickY")
+GV.stickX = stickxvalue("X Stick", "globals.pad0->analog1.x")
+GV.stickY = stickyvalue("Y Stick", "globals.pad0->analog1.y")
+GV.xCStick = stickxvalue("X C-Stick", "globals.pad0->analog2.x")
+GV.yCStick = stickyvalue("Y C-Stick", "globals.pad0->analog2.y")
 GV.lShoulder = value("L Shoulder", "sPadData[0].triggerLeft", UByteType)
 GV.rShoulder = value("R Shoulder", "sPadData[0].triggerRight", UByteType)
 
