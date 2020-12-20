@@ -91,10 +91,7 @@ end
 
 function Block:getBlockKey(...)
   -- Subclasses should override this.
-  -- Should take the same parameters as the Block subclass's init() function.
-  -- Should return a key (int or string) which uniquely identifies an
-  -- instance of the Block subclass.
-  error("Function not implemented")
+  return error("Function not implemented")
 end
 
 

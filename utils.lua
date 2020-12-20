@@ -262,13 +262,9 @@ function utils.floatToStr(x, options)
   if x == nil then return "nil" end
   if options == nil then options = {} end
 
-  -- Guarantee at least a certain number of chars before the decimal
-  -- (+/- sign counts as 1 char)
+  -- Guarantee at least a certain number of digits before the decimal
   local beforeDecimal = options.beforeDecimal or nil
-  -- Method of padding the left side of the string: 'zero' or 'space'.
-  -- 'zero' is like '-00049.285'; 'space' is like '   -49.285'
-  local leftPaddingMethod = options.leftPaddingMethod or 'zero'
-  -- Display a certain number of chars after the decimal
+  -- Display a certain number of digits after the decimal
   local afterDecimal = options.afterDecimal or 3
   -- Trim zeros from the right end
   local trimTrailingZeros = options.trimTrailingZeros or false
@@ -278,14 +274,16 @@ function utils.floatToStr(x, options)
   local f = "%"
   if signed then f = f.."+" end
   if beforeDecimal then
-    local totalChars = beforeDecimal + 1 + afterDecimal
-    if leftPaddingMethod == 'zero' then
-      f = f.."0"..totalChars
-    elseif leftPaddingMethod == 'space' then
-      f = f..totalChars
+    if signed then
+      -- The number after the 0 counts all digits + decimal point + sign
+      f = f.."0"..(beforeDecimal+afterDecimal+2)
+    else
+      -- The number after the 0 counts all digits + decimal point
+      f = f.."0"..(beforeDecimal+afterDecimal+1)
     end
   end
   f = f.."."..afterDecimal.."f"
+
   local s = string.format(f, x)
 
   if trimTrailingZeros then
@@ -322,21 +320,6 @@ function utils.writeIntBE(address, value, numberOfBytesToWrite)
   local remainingValue = value
   local bytes = {}
   for n = numberOfBytesToWrite,1,-1 do
-    byteValue = remainingValue % 256
-    byteValue = tonumber(string.format("%.f", byteValue))  -- round to int
-    remainingValue = (remainingValue - byteValue) / 256
-    remainingValue = tonumber(string.format("%.f", remainingValue))
-    bytes[n] = byteValue
-  end
-
-  writeBytes(address, bytes)
-end
-
-function utils.writeIntLE(address, value, numberOfBytesToWrite)
-  local remainingValue = value
-  local bytes = {}
-
-  for n = 1,numberOfBytesToWrite do
     byteValue = remainingValue % 256
     byteValue = tonumber(string.format("%.f", byteValue))  -- round to int
     remainingValue = (remainingValue - byteValue) / 256
@@ -391,12 +374,6 @@ end
 
 function utils.writeFloatBE(address, value, numberOfBytesToWrite)
   utils.writeIntBE(
-    address, utils.floatToInt(value, numberOfBytesToWrite), numberOfBytesToWrite
-  )
-end
-
-function utils.writeFloatLE(address, value, numberOfBytesToWrite)
-  utils.writeIntLE(
     address, utils.floatToInt(value, numberOfBytesToWrite), numberOfBytesToWrite
   )
 end
