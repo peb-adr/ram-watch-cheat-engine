@@ -58,7 +58,7 @@ function layouts.test:init()
   self:addItem(game.hansState)
   --self:addItem(game.buttons)
   
-  self:addImage(InputDisplay, {"TronStyleNoDpad", self.game.ABXYS, self.game.DZ, self.game.stickX, self.game.stickY, self.game.xCStick, self.game.yCStick, self.game.lShoulder, self.game.rShoulder}, {x=0, y=550})
+  self:addImage(InputDisplay, {"TronStyleNoDpad", self.game.buttonBits, self.game.stickX, self.game.stickY, self.game.xCStick, self.game.yCStick, self.game.lShoulder, self.game.rShoulder}, {x=0, y=550})
 end
 
 -- local VelocityDisplay = subclass(CompoundElement)

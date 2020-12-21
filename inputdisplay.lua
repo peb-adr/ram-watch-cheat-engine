@@ -9,11 +9,10 @@ local SimpleElement = layouts.SimpleElement
 
 local InputDisplay = subclass(CompoundElement)
 
-function InputDisplay:init(window, style, abxys, dz, mainStickX, mainStickY, cStickX, cStickY, lShoulder, rShoulder, passedDisplayOptions)
+function InputDisplay:init(window, style, buttonBits, mainStickX, mainStickY, cStickX, cStickY, lShoulder, rShoulder, passedDisplayOptions)
 
+	self.buttonBits = buttonBits
   	self.style = style
-	self.abxys = abxys
-	self.dz = dz
 	self.mainStickX = mainStickX
 	self.mainStickY = mainStickY
 	self.cStickX = cStickX
@@ -88,19 +87,21 @@ end
 
 function InputDisplay:update()
 	
+	local b = self.buttonBits:get()
+
 	local buttonPresses = {
-		self.abxys:get()[8],
-		self.abxys:get()[7],
-		self.abxys:get()[6],
-		self.abxys:get()[5],
-		self.abxys:get()[4],
-		self.dz:get()[2],
-		self.dz:get()[3],
-		self.dz:get()[4],
-		self.dz:get()[5],
-		self.dz:get()[6],
-		self.dz:get()[7],
-		self.dz:get()[8]
+		(b >> 16) & 1,
+		(b >> 19) & 1,
+		(b >> 17) & 1,
+		(b >> 18) & 1,
+		(b >>  0) & 1,
+		(b >>  8) & 1,
+		(b >> 12) & 1,
+		(b >> 20) & 1,
+		(b >>  4) & 1,
+		(b >>  6) & 1,
+		(b >>  7) & 1,
+		(b >>  5) & 1
 	}
 	
 	self.elements[1].uiObj.setPicture(self.background)

@@ -7,8 +7,10 @@ local dolphin = require 'dolphin'
 
 package.loaded.valuetypes = nil
 local valuetypes = require 'valuetypes'
+local V = valuetypes.V
 local MV = valuetypes.MV
 local Block = valuetypes.Block
+local Value = valuetypes.Value
 local MemoryValue = valuetypes.MemoryValue
 local FloatType = valuetypes.FloatTypeBE
 local UIntType = valuetypes.IntTypeBE
@@ -56,8 +58,16 @@ function BFBB:init(options)
   addrs["oob_state::shared::flags"] = start + 0x297E48
 
   addrs["sPadData"] = start + 0x292620
-  addrs["sPadData[0].button"] = addrs["sPadData"] + 0
-  addrs["sPadData[0].button 2"] = addrs["sPadData"] + 1
+  --
+  -- sPadData addresses have been replaced by globals.pad0 to fix stick twitching
+  --
+  -- for a version where only analog sticks use globals.pad0
+  --   checkout 1ea2ed0907c4ce99caf258faa7caab4f9509918c 
+  --for a version where both analog sticks and buttons use sPadData
+  --   checkout ea8008ca4652c586f02325fbf113bdbe36d5580d 
+  --
+  -- addrs["sPadData[0].button"] = addrs["sPadData"] + 0
+  -- addrs["sPadData[0].button 2"] = addrs["sPadData"] + 1
   -- addrs["sPadData[0].stickX"] = addrs["sPadData"] + 2
   -- addrs["sPadData[0].stickY"] = addrs["sPadData"] + 3
   -- addrs["sPadData[0].substickX"] = addrs["sPadData"] + 4
@@ -71,6 +81,8 @@ function BFBB:toCEAddress(dolphinAddr)
 end
 
 function BFBB:updateAddresses()
+  self.addrs["globals.pad0->pressed"] = nil
+  self.addrs["globals.pad0->released"] = nil
   self.addrs["globals.pad0->analog1.x"] = nil
   self.addrs["globals.pad0->analog1.y"] = nil
   self.addrs["globals.pad0->analog2.x"] = nil
@@ -88,6 +100,8 @@ function BFBB:updateAddresses()
 
   if pad0 ~= 0 then
     pad0 = self:toCEAddress(pad0)
+    self.addrs["globals.pad0->pressed"] = pad0 + 0x30
+    self.addrs["globals.pad0->released"] = pad0 + 0x34
     self.addrs["globals.pad0->analog1.x"] = pad0 + 0x38
     self.addrs["globals.pad0->analog1.y"] = pad0 + 0x39
     self.addrs["globals.pad0->analog2.x"] = pad0 + 0x3A
@@ -160,6 +174,28 @@ function value(label, offset, typeMixinClass, safeToRead, extraArgs)
   return MV(label, offset, BFBBValue, typeMixinClass, extraArgs)
 end
 
+local ButtonValue = subclass(Value)
+BFBB.ButtonValue = ButtonValue
+
+function ButtonValue:init()
+  Value.init(self)
+
+  self.pressed = 0
+  self.released = 0
+  self.current = 0
+end 
+
+function ButtonValue:updateValue()
+  self.pressed = utils.readIntBE(self.game.addrs["globals.pad0->pressed"])
+  self.released = utils.readIntBE(self.game.addrs["globals.pad0->released"])
+  -- mask in pressed buttons
+  self.current = self.current | self.pressed
+  -- mask out released buttons
+  self.current = self.current & ~self.released
+
+  self.value = self.current
+end
+
 local StickXValue = subclass(BFBBValue)
 BFBB.StickXValue = StickXValue
 
@@ -213,12 +249,9 @@ GV.yvel = value("Y Momentum", "globals.player.ent.frame->vel.y", FloatType, play
 GV.zvel = value("Z Momentum", "globals.player.ent.frame->vel.z", FloatType, playerEntSafeToRead)
 GV.facingAngle = value("Facing angle", "globals.player.ent.frame->rot.angle", FloatType, playerEntSafeToRead)
 GV.hansState = value("Hans State", "oob_state::shared::flags", SIntType)
-GV.ABXYS = value("ABXY & Start", "sPadData[0].button", BinaryType, nil, {binarySize=8, binaryStartBit=7})
-GV.DZ = value("D-Pad & Z", "sPadData[0].button 2", BinaryType, nil, {binarySize=8, binaryStartBit=7})
--- GV.stickX = stickxvalue("X Stick", "sPadData[0].stickX")
--- GV.stickY = stickyvalue("Y Stick", "sPadData[0].stickY")
--- GV.xCStick = stickxvalue("X C-Stick", "sPadData[0].substickX")
--- GV.yCStick = stickyvalue("Y C-Stick", "sPadData[0].substickY")
+-- GV.ABXYS = value("ABXY & Start", "sPadData[0].button", BinaryType, nil, {binarySize=8, binaryStartBit=7}) 
+-- GV.DZ = value("D-Pad & Z", "sPadData[0].button 2", BinaryType, nil, {binarySize=8, binaryStartBit=7}) 
+GV.buttonBits = V(ButtonValue)
 GV.stickX = stickxvalue("X Stick", "globals.pad0->analog1.x")
 GV.stickY = stickyvalue("Y Stick", "globals.pad0->analog1.y")
 GV.xCStick = stickxvalue("X C-Stick", "globals.pad0->analog2.x")
