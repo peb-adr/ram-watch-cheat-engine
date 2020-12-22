@@ -60,7 +60,8 @@ function layouts.test:init()
   -- self:addItem(game.camAngle)
   -- self:addItem(game.hansState)
   self:addItem(game.hansStateStr)
-  --self:addItem(game.buttons)
+  -- self:addItem(game.buttonPressed)
+  -- self:addItem(game.buttonReleased)
 
   self:addLabel{foregroundColor=0x000000}
   -- Momentum Vectors: to adjust scaling change max - vector will scale in range(0, max)

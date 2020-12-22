@@ -67,7 +67,7 @@ function BFBB:init(options)
   --
   -- for a version where only analog sticks use globals.pad0
   --   checkout 1ea2ed0907c4ce99caf258faa7caab4f9509918c 
-  --for a version where both analog sticks and buttons use sPadData
+  -- for a version where both analog sticks and buttons use sPadData
   --   checkout ea8008ca4652c586f02325fbf113bdbe36d5580d 
   --
   -- addrs["sPadData[0].button"] = addrs["sPadData"] + 0
@@ -168,28 +168,6 @@ function BFBBValue:isValid()
     (self.safeToRead == nil or self:safeToRead())
 end
 
-local ButtonValue = subclass(Value)
-BFBB.ButtonValue = ButtonValue
-
-function ButtonValue:init()
-  Value.init(self)
-
-  self.pressed = 0
-  self.released = 0
-  self.current = 0
-end 
-
-function ButtonValue:updateValue()
-  self.pressed = utils.readIntBE(self.game.addrs["globals.pad0->pressed"])
-  self.released = utils.readIntBE(self.game.addrs["globals.pad0->released"])
-  -- mask in pressed buttons
-  self.current = self.current | self.pressed
-  -- mask out released buttons
-  self.current = self.current & ~self.released
-
-  self.value = self.current
-end
-
 -------------------------------------
 ----------- custom values -----------
 -------- subclass(BFBBValue) --------
@@ -214,6 +192,24 @@ end
 ----------- simple values -----------
 ---------- subclass(Value) ----------
 -------------------------------------
+
+local ButtonValue = subclass(Value)
+BFBB.ButtonValue = ButtonValue
+
+function ButtonValue:init()
+  Value.init(self)
+  self.current = 0
+end 
+
+function ButtonValue:updateValue()
+  -- mask in pressed buttons
+  self.current = self.current | self.game.buttonPressed:get()
+  -- mask out released buttons
+  self.current = self.current & ~self.game.buttonReleased:get()
+
+  self.value = self.current
+end
+
 
 local RotatedVelXValue = subclass(Value)
 BFBB.RotatedVelXValue = RotatedVelXValue
@@ -271,13 +267,14 @@ local HansStateStrValue = subclass(Value)
 BFBB.HansStateStrValue = HansStateStrValue
 
 function HansStateStrValue:updateValue()
-  v = tostring(self.game.hansState:get())
-  if v == "3" then
-    v = "Enabled (" .. v .. ")"
-  elseif v == "7" then
-    v = "Disabled (" .. v .. ")"
+  v = self.game.hansState:get()
+  s = tostring(v)
+  if v == 3 then
+    s = "Enabled (" .. s .. ")"
+  elseif v == 7 then
+    s = "Disabled (" .. s .. ")"
   end
-  self.value = v
+  self.value = s
 end
 
 -- override to prevent unnecessary string conversion
@@ -336,8 +333,8 @@ GV.facingAngle = value("Facing Angle", "globals.player.ent.frame->rot.angle", Fl
 GV.camAngle = value("Camera angle", "globals.camera.yaw_cur", FloatType)
 GV.hansState = value("Hans State", "oob_state::shared::flags", SIntType)
 GV.hansStateStr = simplevalue("Hans State", HansStateStrValue)
--- GV.ABXYS = value("ABXY & Start", "sPadData[0].button", BinaryType, nil, {binarySize=8, binaryStartBit=7}) 
--- GV.DZ = value("D-Pad & Z", "sPadData[0].button 2", BinaryType, nil, {binarySize=8, binaryStartBit=7}) 
+GV.buttonPressed = value("Pressed", "globals.pad0->pressed", UIntType)
+GV.buttonReleased = value("Released", "globals.pad0->released", UIntType)
 GV.buttonBits = simplevalue("", ButtonValue)
 GV.stickX = customvalue("X Stick", "globals.pad0->analog1.x", StickXValue, SByteType)
 GV.stickY = customvalue("Y Stick", "globals.pad0->analog1.y", StickYValue, SByteType)
@@ -356,7 +353,6 @@ BFBB.HVelocityImage = HVelocityImage
 
 function HVelocityImage:init(window, game, options)
   options = options or {}
-  -- options.max = 15
   options.max = options.max or 15
   options.square = options.square or false
 
