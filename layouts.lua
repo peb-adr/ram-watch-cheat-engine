@@ -365,7 +365,8 @@ function StickInputImage:init(window, stickX, stickY, options)
   -- Line color; default = black
   local foregroundColor = options.foregroundColor or 0x000000
   -- Size of the image
-  self.size = options.size or 100
+  self.sizex = options.sizex or options.size or 100
+  self.sizey = options.sizey or options.size or 100
   -- Thickness of lines drawn
   self.lineThickness = options.lineThickness or 2
   -- Min and max of the stickX and stickY value ranges
@@ -379,7 +380,7 @@ function StickInputImage:init(window, stickX, stickY, options)
   self.square = options.square or false
 
   self.uiObj = createImage(window)
-  self.uiObj:setSize(self.size, self.size)
+  self.uiObj:setSize(self.sizex, self.sizey)
 
   self.canvas = self.uiObj:getCanvas()
   -- Brush: ellipse/rect fill
@@ -388,7 +389,7 @@ function StickInputImage:init(window, stickX, stickY, options)
   self.canvas:getPen():setColor(foregroundColor)
   self.canvas:getPen():setWidth(self.lineThickness)
   -- Initialize the whole image with the brush color
-  self.canvas:fillRect(0,0, self.size,self.size)
+  self.canvas:fillRect(0,0, self.sizex,self.sizey)
 
   self.stickX = stickX
   self.stickY = stickY
@@ -397,20 +398,21 @@ end
 function StickInputImage:update()
   if not self.stickX:isValid() then return end
 
-  local size = self.size
+  local sizex = self.sizex
+  local sizey = self.sizey
 
   -- Clear the image and redraw the outline.
   if self.square then
-    self.canvas:rect(1,1, size,size)
+    self.canvas:rect(1,1, sizex,sizey)
   else
-    self.canvas:ellipse(0,0, size,size)
+    self.canvas:ellipse(0,0, sizex,sizey)
   end
 
   -- Draw a line indicating where the stick is currently positioned.
 
-  local xCenter = size/2
-  local yCenter = size/2
-  local radius = size/2
+  local xCenter = sizex/2
+  local yCenter = sizey/2
+  local radius = sizex/2
   local xRaw = self.stickX:get()
   local yRaw = self.stickY:get()
   -- stickX and stickY range from min to max. Transform that to a range from
@@ -419,8 +421,8 @@ function StickInputImage:update()
   -- top to bottom, so we need to invert the Y pixel number.
   local xInZeroToOneRange = (xRaw - self.min) / (self.max - self.min)
   local yInZeroToOneRange = (yRaw - self.min) / (self.max - self.min)
-  local xPixel = xInZeroToOneRange * size
-  local yPixel = size - (yInZeroToOneRange * size)
+  local xPixel = xInZeroToOneRange * sizex
+  local yPixel = sizey - (yInZeroToOneRange * sizey)
 
   if not self.square then
     -- Confine the stick position to the circular range.
