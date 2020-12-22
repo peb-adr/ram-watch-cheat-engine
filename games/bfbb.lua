@@ -21,6 +21,9 @@ local SShortType = valuetypes.SignedShortTypeBE
 local SByteType = valuetypes.SignedByteType
 local BinaryType = valuetypes.BinaryType
 
+package.loaded.layouts = nil
+local layoutsModule = require 'layouts'
+
 local BFBB = subclass(dolphin.DolphinGame)
 
 BFBB.supportedGameVersions = {
@@ -40,6 +43,7 @@ function BFBB:init(options)
   self.addrs = addrs
   
   addrs["globals"] = start + 0x3C0558
+  addrs["globals.camera.yaw_cur"] = addrs["globals"] + 0x1D4
   addrs["globals.pad0"] = addrs["globals"] + 0x31C
   addrs["globals.player"] = addrs["globals"] + 0x6E0
   addrs["globals.player.ent"] = addrs["globals.player"] + 0
@@ -164,16 +168,6 @@ function BFBBValue:isValid()
     (self.safeToRead == nil or self:safeToRead())
 end
 
-function value(label, offset, typeMixinClass, safeToRead, extraArgs)
-  if extraArgs == nil then
-    extraArgs = {}
-  end
-
-  extraArgs.safeToRead = safeToRead
-
-  return MV(label, offset, BFBBValue, typeMixinClass, extraArgs)
-end
-
 local ButtonValue = subclass(Value)
 BFBB.ButtonValue = ButtonValue
 
@@ -196,6 +190,11 @@ function ButtonValue:updateValue()
   self.value = self.current
 end
 
+-------------------------------------
+----------- custom values -----------
+-------- subclass(BFBBValue) --------
+-------------------------------------
+
 local StickXValue = subclass(BFBBValue)
 BFBB.StickXValue = StickXValue
 
@@ -203,15 +202,6 @@ function StickXValue:get()
   return 128 + BFBBValue.get(self)
 end
 
-function stickxvalue(label, offset, safeToRead, extraArgs)
-  if extraArgs == nil then
-    extraArgs = {}
-  end
-
-  extraArgs.safeToRead = safeToRead
-
-  return MV(label, offset, StickXValue, SByteType, extraArgs)
-end
 
 local StickYValue = subclass(BFBBValue)
 BFBB.StickYValue = StickYValue
@@ -220,14 +210,109 @@ function StickYValue:get()
   return 128 - BFBBValue.get(self)
 end
 
-function stickyvalue(label, offset, safeToRead, extraArgs)
+-------------------------------------
+----------- simple values -----------
+---------- subclass(Value) ----------
+-------------------------------------
+
+local RotatedVelXValue = subclass(Value)
+BFBB.RotatedVelXValue = RotatedVelXValue
+
+function RotatedVelXValue:updateValue()
+  local angle = self.game.camAngle:get()
+  local s = math.sin(angle)
+  local c = math.cos(angle)
+
+  self.value = -self.game.xvel:get() * c + self.game.zvel:get() * s
+end
+
+
+local RotatedVelZValue = subclass(Value)
+BFBB.RotatedVelZValue = RotatedVelZValue
+
+function RotatedVelZValue:updateValue()
+  local angle = self.game.camAngle:get()
+  local s = math.sin(angle)
+  local c = math.cos(angle)
+
+  self.value = self.game.xvel:get() * s + self.game.zvel:get() * c
+end
+
+
+local HVelLengthValue = subclass(Value)
+BFBB.HVelLengthValue = HVelLengthValue
+
+function HVelLengthValue:updateValue()
+  local angle = self.game.camAngle:get()
+  local x = self.game.xvel:get()
+  local z = self.game.zvel:get()
+
+  self.value = math.sqrt(math.pow(x, 2) + math.pow(z, 2))
+end
+
+
+local VVelLengthValue = subclass(Value)
+BFBB.VVelLengthValue = VVelLengthValue
+
+function VVelLengthValue:updateValue()
+  self.value = self.game.yvel:get()
+end
+
+
+local ZeroValue = subclass(Value)
+BFBB.ZeroValue = ZeroValue
+
+function ZeroValue:updateValue()
+  self.value = 0
+end
+
+
+local HansStateStrValue = subclass(Value)
+BFBB.HansStateStrValue = HansStateStrValue
+
+function HansStateStrValue:updateValue()
+  v = tostring(self.game.hansState:get())
+  if v == "3" then
+    v = "Enabled (" .. v .. ")"
+  elseif v == "7" then
+    v = "Disabled (" .. v .. ")"
+  end
+  self.value = v
+end
+
+-- override to prevent unnecessary string conversion
+function HansStateStrValue:displayValue(options)
+  return self.value
+end
+
+-------------------------------------
+---------- value functions ----------
+-------------------------------------
+
+function value(label, offset, typeMixinClass, safeToRead, extraArgs)
   if extraArgs == nil then
     extraArgs = {}
   end
 
   extraArgs.safeToRead = safeToRead
 
-  return MV(label, offset, StickYValue, SByteType, extraArgs)
+  return MV(label, offset, BFBBValue, typeMixinClass, extraArgs)
+end
+
+function customvalue(label, offset, valueClass, typeMixinClass, safeToRead, extraArgs)
+  if extraArgs == nil then
+    extraArgs = {}
+  end
+
+  extraArgs.safeToRead = safeToRead
+
+  return MV(label, offset, valueClass, typeMixinClass, extraArgs)
+end
+
+function simplevalue(label, valueClass)
+  v = V(valueClass)
+  v.label = label
+  return v
 end
 
 function playerEntSafeToRead(value)
@@ -247,16 +332,47 @@ GV.zpos = value("Z Position", "globals.player.ent.model->Mat->pos.z", FloatType,
 GV.xvel = value("X Momentum", "globals.player.ent.frame->vel.x", FloatType, playerEntSafeToRead)
 GV.yvel = value("Y Momentum", "globals.player.ent.frame->vel.y", FloatType, playerEntSafeToRead)
 GV.zvel = value("Z Momentum", "globals.player.ent.frame->vel.z", FloatType, playerEntSafeToRead)
-GV.facingAngle = value("Facing angle", "globals.player.ent.frame->rot.angle", FloatType, playerEntSafeToRead)
+GV.facingAngle = value("Facing Angle", "globals.player.ent.frame->rot.angle", FloatType, playerEntSafeToRead)
+GV.camAngle = value("Camera angle", "globals.camera.yaw_cur", FloatType)
 GV.hansState = value("Hans State", "oob_state::shared::flags", SIntType)
+GV.hansStateStr = simplevalue("Hans State", HansStateStrValue)
 -- GV.ABXYS = value("ABXY & Start", "sPadData[0].button", BinaryType, nil, {binarySize=8, binaryStartBit=7}) 
 -- GV.DZ = value("D-Pad & Z", "sPadData[0].button 2", BinaryType, nil, {binarySize=8, binaryStartBit=7}) 
-GV.buttonBits = V(ButtonValue)
-GV.stickX = stickxvalue("X Stick", "globals.pad0->analog1.x")
-GV.stickY = stickyvalue("Y Stick", "globals.pad0->analog1.y")
-GV.xCStick = stickxvalue("X C-Stick", "globals.pad0->analog2.x")
-GV.yCStick = stickyvalue("Y C-Stick", "globals.pad0->analog2.y")
+GV.buttonBits = simplevalue("", ButtonValue)
+GV.stickX = customvalue("X Stick", "globals.pad0->analog1.x", StickXValue, SByteType)
+GV.stickY = customvalue("Y Stick", "globals.pad0->analog1.y", StickYValue, SByteType)
+GV.xCStick = customvalue("X C-Stick", "globals.pad0->analog2.x", StickXValue, SByteType)
+GV.yCStick = customvalue("Y C-Stick", "globals.pad0->analog2.y", StickYValue, SByteType)
 GV.lShoulder = value("L Shoulder", "sPadData[0].triggerLeft", UByteType)
 GV.rShoulder = value("R Shoulder", "sPadData[0].triggerRight", UByteType)
+GV.xvelRot = simplevalue("", RotatedVelXValue)
+GV.zvelRot = simplevalue("", RotatedVelZValue)
+GV.hvelLength = simplevalue("Horizontal", HVelLengthValue)
+GV.vvelLength = simplevalue("Vertical", VVelLengthValue)
+GV.zero = simplevalue("", ZeroValue)
+
+local HVelocityImage = subclass(layoutsModule.StickInputImage)
+BFBB.HVelocityImage = HVelocityImage
+
+function HVelocityImage:init(window, game, options)
+  options = options or {}
+  -- options.max = 15
+  options.max = options.max or 15
+  options.square = options.square or false
+
+  layoutsModule.StickInputImage.init(self, window, game.xvelRot, game.zvelRot, options)
+end
+
+local VVelocityImage = subclass(layoutsModule.StickInputImage)
+BFBB.VVelocityImage = VVelocityImage
+
+function VVelocityImage:init(window, game, options)
+  options = options or {}
+  options.max = options.max or 15
+  options.square = options.square or true
+  options.sizex = 20
+
+  layoutsModule.StickInputImage.init(self, window, game.zero, game.yvel, options)
+end
 
 return BFBB
