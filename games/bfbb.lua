@@ -32,6 +32,7 @@ BFBB.supportedGameVersions = {
 
 BFBB.layoutModuleNames = {'bfbb_layouts'}
 BFBB.framerate = 60
+BFBB.labelPadding = 0
 
 function BFBB:init(options)
   dolphin.DolphinGame.init(self, options)
@@ -139,7 +140,13 @@ function BFBB:updateAddresses()
   end
 end
 
-local GV = BFBB.blockValues
+function BFBB:setLabelPadding(padding)
+  BFBB.labelPadding = padding
+end
+
+function BFBB:padLabel(label)
+  return string.format("%-" .. BFBB.labelPadding .. "s", label)
+end
 
 local BFBBValue = subclass(MemoryValue)
 BFBB.BFBBValue = BFBBValue
@@ -168,6 +175,19 @@ function BFBBValue:isValid()
     (self.safeToRead == nil or self:safeToRead())
 end
 
+function BFBBValue:getLabel()
+  return self.game:padLabel(self.label)
+end
+
+
+local SimpleValue = subclass(Value)
+BFBB.SimpleValue = SimpleValue
+
+function SimpleValue:getLabel()
+  return self.game:padLabel(self.label)
+end
+
+
 -------------------------------------
 ----------- custom values -----------
 -------- subclass(BFBBValue) --------
@@ -190,14 +210,14 @@ end
 
 -------------------------------------
 ----------- simple values -----------
----------- subclass(Value) ----------
+------- subclass(SimpleValue) -------
 -------------------------------------
 
-local ButtonValue = subclass(Value)
+local ButtonValue = subclass(SimpleValue)
 BFBB.ButtonValue = ButtonValue
 
 function ButtonValue:init()
-  Value.init(self)
+  SimpleValue.init(self)
   self.current = 0
 end 
 
@@ -211,7 +231,7 @@ function ButtonValue:updateValue()
 end
 
 
-local RotatedVelXValue = subclass(Value)
+local RotatedVelXValue = subclass(SimpleValue)
 BFBB.RotatedVelXValue = RotatedVelXValue
 
 function RotatedVelXValue:updateValue()
@@ -223,7 +243,7 @@ function RotatedVelXValue:updateValue()
 end
 
 
-local RotatedVelZValue = subclass(Value)
+local RotatedVelZValue = subclass(SimpleValue)
 BFBB.RotatedVelZValue = RotatedVelZValue
 
 function RotatedVelZValue:updateValue()
@@ -235,7 +255,26 @@ function RotatedVelZValue:updateValue()
 end
 
 
-local HVelLengthValue = subclass(Value)
+function centerString(s, n)
+  local l = string.len(s)
+  if l >= n then return s end
+
+  local d = n - l
+  local r = d // 2
+  local l = d - r
+
+  for i=1,l do
+    s = " " .. s
+  end
+  for i=1,r do
+    s = s .. " "
+  end
+
+  return s
+  
+end
+
+local HVelLengthValue = subclass(SimpleValue)
 BFBB.HVelLengthValue = HVelLengthValue
 
 function HVelLengthValue:updateValue()
@@ -246,16 +285,26 @@ function HVelLengthValue:updateValue()
   self.value = math.sqrt(math.pow(x, 2) + math.pow(z, 2))
 end
 
+function HVelLengthValue:displayValue(options)
+  s = SimpleValue.displayValue(self, options)
+  return centerString(s, 10)
+end
 
-local VVelLengthValue = subclass(Value)
+
+local VVelLengthValue = subclass(SimpleValue)
 BFBB.VVelLengthValue = VVelLengthValue
 
 function VVelLengthValue:updateValue()
   self.value = self.game.yvel:get()
 end
 
+function VVelLengthValue:displayValue(options)
+  s = SimpleValue.displayValue(self, options)
+  return centerString(s, 10)
+end
 
-local ZeroValue = subclass(Value)
+
+local ZeroValue = subclass(SimpleValue)
 BFBB.ZeroValue = ZeroValue
 
 function ZeroValue:updateValue()
@@ -263,7 +312,7 @@ function ZeroValue:updateValue()
 end
 
 
-local HansStateStrValue = subclass(Value)
+local HansStateStrValue = subclass(SimpleValue)
 BFBB.HansStateStrValue = HansStateStrValue
 
 function HansStateStrValue:updateValue()
@@ -316,6 +365,7 @@ function playerEntSafeToRead(value)
   return utils.readIntBE(value.game.addrs["gGameOstrich"]) == 2
 end
 
+local GV = BFBB.blockValues
 GV.health = value("Health", "globals.player.Health", UIntType)
 GV.bowlingState = value("Bowling State", "globals.player.IsBubbleBowling", SIntType)
 GV.bowlingSpeed = value("Bowl Speed", "globals.player.bbowlInitVel", FloatType)

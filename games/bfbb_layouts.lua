@@ -5,8 +5,6 @@ local subclass = utils.subclass
 package.loaded.layouts = nil
 local layoutsModule = require 'layouts'
 local Layout = layoutsModule.Layout
--- local CompoundElement = layoutsModule.CompoundElement
--- local SimpleElement = layoutsModule.SimpleElement
 
 package.loaded.inputDisplayModule = nil
 local inputDisplayModule = require 'inputdisplay'
@@ -14,13 +12,15 @@ local InputDisplay = inputDisplayModule.InputDisplay
 
 local layouts = {}
 
-layouts.test = subclass(Layout)
-function layouts.test:init()
+layouts.normal = subclass(Layout)
+layouts.normal.labelPadding = 0
+function layouts.normal:init()
   self:setBreakpointUpdateMethod()
   --self:activateAutoPositioningY()
-  self.window:setSize(400, 700)
+  self.window:setSize(400, 800)
 
   local game = self.game
+  game:setLabelPadding(0)
   
   self:addLabel{x=10, y=10, fontSize=16}
   self:addItem("Collectables")
@@ -38,23 +38,30 @@ function layouts.test:init()
 
   self:addLabel{x=10, y=210, fontSize=16}
   self:addItem("Momentum")
-  self:addLabel{x=155, y=275, fontSize=12}
+  -- self:addLabel{x=155, y=275, fontSize=12}
   -- self:addItem(game.xvel)
   -- self:addItem(game.yvel)
   -- self:addItem(game.zvel)
-  self:addItem(game.hvelLength)
-  self:addItem(game.vvelLength)
+  
+  self:addLabel{x=35, y=240, fontSize=12}
+  self:addItem("Horizontal")
+  self:addLabel{x=158, y=240, fontSize=12}
+  self:addItem("Vertical")
+  self:addLabel{x=37, y=370, fontSize=12}
+  self:addItem(game.hvelLength, {nolabel=true})
+  self:addLabel{x=152, y=370, fontSize=12}
+  self:addItem(game.vvelLength, {nolabel=true})
 
-  self:addLabel{x=10, y=360, fontSize=16}
+  self:addLabel{x=10, y=390, fontSize=16}
   self:addItem("Bowling")
-  self:addLabel{x=20, y=390, fontSize=12}
+  self:addLabel{x=20, y=420, fontSize=12}
   self:addItem(game.bowlingState)
   self:addItem(game.bowlingSpeed)
   self:addItem(game.bowlingDamp)
 
-  self:addLabel{x=10, y=460, fontSize=16}
+  self:addLabel{x=10, y=490, fontSize=16}
   self:addItem("Misc")
-  self:addLabel{x=20, y=490, fontSize=12}
+  self:addLabel{x=20, y=520, fontSize=12}
   self:addItem(game.health)
   self:addItem(game.facingAngle)
   -- self:addItem(game.camAngle)
@@ -65,8 +72,8 @@ function layouts.test:init()
 
   self:addLabel{foregroundColor=0x000000}
   -- Momentum Vectors: to adjust scaling change max - vector will scale in range(0, max)
-  self:addImage(self.game.HVelocityImage, {game}, {max=15, lineThickness=2, foregroundColor=0x000000, x=20, y=250})
-  self:addImage(self.game.VVelocityImage, {game}, {max=15, lineThickness=2, foregroundColor=0x000000, x=125, y=250})
+  self:addImage(self.game.HVelocityImage, {game}, {max=5, lineThickness=2, foregroundColor=0x000000, x=20, y=265})
+  self:addImage(self.game.VVelocityImage, {game}, {max=15, lineThickness=2, foregroundColor=0x000000, x=175, y=265})
   
   self:addImage(InputDisplay,
       {"TronStyleNoDpad",
@@ -78,7 +85,87 @@ function layouts.test:init()
         self.game.lShoulder,
         self.game.rShoulder
       },
-      {x=10, y=580})
+      {x=10, y=640})
+end
+
+-- compatibility
+layouts.test = layouts.normal
+
+
+layouts.mono = subclass(Layout)
+function layouts.mono:init()
+  self:setBreakpointUpdateMethod()
+  --self:activateAutoPositioningY()
+  self.window:setSize(400, 800)
+  self.labelDefaults = {fontName="Consolas"}
+
+  local game = self.game
+  game:setLabelPadding(14)
+  
+  self:addLabel{x=10, y=10, fontSize=16}
+  self:addItem("Collectables")
+  self:addLabel{x=20, y=40, fontSize=12}
+  self:addItem(game.spatulas)
+  self:addItem(game.shinyObjects)
+  self:addItem(game.socks)
+
+  self:addLabel{x=10, y=110, fontSize=16}
+  self:addItem("Position")
+  self:addLabel{x=20, y=140, fontSize=12}
+  self:addItem(game.xpos)
+  self:addItem(game.ypos)
+  self:addItem(game.zpos)
+
+  self:addLabel{x=10, y=210, fontSize=16}
+  self:addItem("Momentum")
+  -- self:addLabel{x=155, y=275, fontSize=12}
+  -- self:addItem(game.xvel)
+  -- self:addItem(game.yvel)
+  -- self:addItem(game.zvel)
+  
+  self:addLabel{x=28, y=240, fontSize=12}
+  self:addItem("Horizontal")
+  self:addLabel{x=152, y=240, fontSize=12}
+  self:addItem("Vertical")
+  self:addLabel{x=20, y=370, fontSize=12}
+  self:addItem(game.hvelLength, {nolabel=true})
+  self:addLabel{x=135, y=370, fontSize=12}
+  self:addItem(game.vvelLength, {nolabel=true})
+
+  self:addLabel{x=10, y=395, fontSize=16}
+  self:addItem("Bowling")
+  self:addLabel{x=20, y=425, fontSize=12}
+  self:addItem(game.bowlingState)
+  self:addItem(game.bowlingSpeed)
+  self:addItem(game.bowlingDamp)
+
+  self:addLabel{x=10, y=495, fontSize=16}
+  self:addItem("Misc")
+  self:addLabel{x=20, y=525, fontSize=12}
+  self:addItem(game.health)
+  self:addItem(game.facingAngle)
+  -- self:addItem(game.camAngle)
+  -- self:addItem(game.hansState)
+  self:addItem(game.hansStateStr)
+  -- self:addItem(game.buttonPressed)
+  -- self:addItem(game.buttonReleased)
+
+  self:addLabel{foregroundColor=0x000000}
+  -- Momentum Vectors: to adjust scaling change max - vector will scale in range(0, max)
+  self:addImage(self.game.HVelocityImage, {game}, {max=5, lineThickness=2, foregroundColor=0x000000, x=20, y=265})
+  self:addImage(self.game.VVelocityImage, {game}, {max=15, lineThickness=2, foregroundColor=0x000000, x=175, y=265})
+  
+  self:addImage(InputDisplay,
+      {"TronStyleNoDpad",
+        self.game.buttonBits,
+        self.game.stickX,
+        self.game.stickY,
+        self.game.xCStick,
+        self.game.yCStick,
+        self.game.lShoulder,
+        self.game.rShoulder
+      },
+      {x=10, y=645})
 end
 
 return {
