@@ -402,6 +402,7 @@ function StickInputImage:update()
   local sizey = self.sizey
 
   -- Clear the image and redraw the outline.
+  self.canvas:clear()
   if self.square then
     self.canvas:rect(1,1, sizex,sizey)
   else
