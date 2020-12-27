@@ -72,8 +72,8 @@ function layouts.normal:init()
 
   self:addLabel{foregroundColor=0x000000}
   -- Momentum Vectors: to adjust scaling change max - vector will scale in range(0, max)
-  self:addImage(self.game.HVelocityImage, {game}, {max=5, lineThickness=2, foregroundColor=0x000000, x=20, y=265})
-  self:addImage(self.game.VVelocityImage, {game}, {max=15, lineThickness=2, foregroundColor=0x000000, x=175, y=265})
+  self:addImage(self.game.HVelocityImage, {game}, {max=11.5, lineThickness=2, foregroundColor=0x000000, x=20, y=265})
+  self:addImage(self.game.VVelocityImage, {game}, {max=11.5, lineThickness=2, foregroundColor=0x000000, x=175, y=265})
   
   self:addImage(InputDisplay,
       {"TronStyleNoDpad",
@@ -147,13 +147,14 @@ function layouts.mono:init()
   -- self:addItem(game.camAngle)
   -- self:addItem(game.hansState)
   self:addItem(game.hansStateStr)
+  -- self:addItem(game.jumpPower)
   -- self:addItem(game.buttonPressed)
   -- self:addItem(game.buttonReleased)
 
   self:addLabel{foregroundColor=0x000000}
   -- Momentum Vectors: to adjust scaling change max - vector will scale in range(0, max)
-  self:addImage(self.game.HVelocityImage, {game}, {max=5, lineThickness=2, foregroundColor=0x000000, x=20, y=265})
-  self:addImage(self.game.VVelocityImage, {game}, {max=15, lineThickness=2, foregroundColor=0x000000, x=175, y=265})
+  self:addImage(self.game.HVelocityImage, {game}, {max=11.5, lineThickness=2, foregroundColor=0x000000, x=20, y=265})
+  self:addImage(self.game.VVelocityImage, {game}, {max=11.5, lineThickness=2, foregroundColor=0x000000, x=175, y=265})
   
   self:addImage(InputDisplay,
       {"TronStyleNoDpad",
@@ -166,6 +167,120 @@ function layouts.mono:init()
         self.game.rShoulder
       },
       {x=10, y=645})
+end
+
+
+
+layouts.render = subclass(Layout)
+function layouts.render:init()
+  self:setBreakpointUpdateMethod()
+  --self:activateAutoPositioningY()
+  self.window:setSize(1700, 1050)
+  self.labelDefaults = {fontName="Consolas"}
+
+  local game = self.game
+  game:setLabelPadding(14)
+  local labelFontSize = 30
+  local textFontSize = 23
+  local layoutScale = 1.7
+
+  -- change to false to prevent screenshots from being taken
+  self.dumpFrames = true
+
+  --------------------------------------------------
+  -- ADJUST ME!
+  --------------------------------------------------
+  -- The following to lines should read like this:
+  -- self.nirCmd = "C:\\path\\to\\nirCmd\\nircmd.exe"
+  -- self.imgOut = "C:\\path\\to\\frames"
+  self.nirCmd = nil
+  self.imgOut = nil
+  --------------------------------------------------
+
+  self:addLabel{x=10*layoutScale, y=10*layoutScale, fontSize=labelFontSize}
+  self:addItem("Collectables")
+  self:addLabel{x=20*layoutScale, y=40*layoutScale, fontSize=textFontSize}
+  self:addItem(game.spatulas)
+  self:addItem(game.shinyObjects)
+  self:addItem(game.socks)
+
+  self:addLabel{x=10*layoutScale, y=110*layoutScale, fontSize=labelFontSize}
+  self:addItem("Position")
+  self:addLabel{x=20*layoutScale, y=140*layoutScale, fontSize=textFontSize}
+  self:addItem(game.xpos)
+  self:addItem(game.ypos)
+  self:addItem(game.zpos)
+
+  self:addLabel{x=10*layoutScale, y=210*layoutScale, fontSize=labelFontSize}
+  self:addItem("Momentum")
+  -- self:addLabel{x=155*layoutScale, y=275*layoutScale, fontSize=textFontSize}
+  -- self:addItem(game.xvel)
+  -- self:addItem(game.yvel)
+  -- self:addItem(game.zvel)
+  
+  self:addLabel{x=25*layoutScale, y=240*layoutScale, fontSize=textFontSize}
+  self:addItem("Horizontal")
+  self:addLabel{x=149*layoutScale, y=240*layoutScale, fontSize=textFontSize}
+  self:addItem("Vertical")
+  self:addLabel{x=17*layoutScale, y=370*layoutScale, fontSize=textFontSize}
+  self:addItem(game.hvelLength, {nolabel=true})
+  self:addLabel{x=132*layoutScale, y=370*layoutScale, fontSize=textFontSize}
+  self:addItem(game.vvelLength, {nolabel=true})
+
+  self:addLabel{x=10*layoutScale, y=395*layoutScale, fontSize=labelFontSize}
+  self:addItem("Bowling")
+  self:addLabel{x=20*layoutScale, y=425*layoutScale, fontSize=textFontSize}
+  self:addItem(game.bowlingState)
+  self:addItem(game.bowlingSpeed)
+  self:addItem(game.bowlingDamp)
+
+  self:addLabel{x=10*layoutScale, y=495*layoutScale, fontSize=labelFontSize}
+  self:addItem("Misc")
+  self:addLabel{x=20*layoutScale, y=525*layoutScale, fontSize=textFontSize}
+  self:addItem(game.health)
+  self:addItem(game.facingAngle)
+  -- self:addItem(game.camAngle)
+  -- self:addItem(game.hansState)
+  self:addItem(game.hansStateStr)
+  -- self:addItem(game.jumpPower)
+  -- self:addItem(game.buttonPressed)
+  -- self:addItem(game.buttonReleased)
+
+  self:addLabel{foregroundColor=0x000000}
+  -- Momentum Vectors: to adjust scaling change max - vector will scale in range(0, max)
+  self:addImage(self.game.HVelocityImage, {game}, {max=11.5, lineThickness=3, foregroundColor=0x000000, x=20*layoutScale, y=265*layoutScale, size=100*layoutScale})
+  self:addImage(self.game.VVelocityImage, {game}, {max=11.5, lineThickness=3, foregroundColor=0x000000, x=175*layoutScale, y=265*layoutScale, sizex=20*layoutScale, sizey=100*layoutScale})
+  
+  self:addImage(InputDisplay,
+      {"TronStyleNoDpadUpscaled",
+        self.game.buttonBits,
+        self.game.stickX,
+        self.game.stickY,
+        self.game.xCStick,
+        self.game.yCStick,
+        self.game.lShoulder,
+        self.game.rShoulder
+      },
+      {x=710, y=0})
+
+end
+
+function layouts.render:update()
+  Layout.update(self)
+  if self.dumpFrames == nil or not self.dumpFrames then return end
+
+  if self.nirCmd == nil then
+    error("Please specify path to nircmd.exe within the 'render' layout definition (should be around line 191)")
+  end
+  if self.imgOut == nil then
+    error("Please specify path to save screenshots to within the 'render' layout definition (should be around line 191)")
+  end
+
+  local imgOut = string.format("frame%015d.png", self.game:getFrameCount() - 1)
+  local imgOut = "\"" .. self.imgOut .. "\\" .. imgOut .. "\""
+  local cmd = "\"" .. self.nirCmd .. "\"" .. " savescreenshot " .. imgOut
+
+  os.execute("\"" .. cmd .. "\"")
 end
 
 return {

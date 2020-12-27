@@ -9,14 +9,14 @@ local buttons = {
 	{File = '/X.png', Pos = {849, 126}, Size = {70,125} },
 	{File = '/Y.png', Pos = {673, 49}, Size = {126,73} },
 	{File = '/Start.png', Pos = {560, 108}, Size = {48,48} },
-	{File = '/R.png', Pos = {19, 14}, Size = {220,39} },
-	{File = '/R.png', Pos = {309, 14}, Size = {220,39} },
-	{File = '/Z.png', Pos = {828, 32}, Size = {103,52} }
+	{File = '/R.png', Pos = {21, 16}, Size = {220,39} },
+	{File = '/R.png', Pos = {311, 17}, Size = {220,39} },
+	{File = '/Z.png', Pos = {830, 32}, Size = {103,52} }
 }
 
 local analogMarkers = {
-	{File = '/Stick.png', Pos = {60, 109}, Size = {147,147}, Range = 50 },
-	{File = '/cstick.png', Pos = {375, 138}, Size = {90,90}, Range = 63 }
+	{File = '/Stick.png', Pos = {60, 111}, Size = {147,147}, Range = 50 },
+	{File = '/cstick.png', Pos = {375, 139}, Size = {90,90}, Range = 63 }
 }
 
 local shoulders = {

@@ -59,6 +59,7 @@ function BFBB:init(options)
 
   addrs["sBubbleBowlTimer"] = start + 0x3CB6CC
   addrs["gGameOstrich"] = start + 0x3CB8AC
+  addrs["jumpPower"] = start + 0x3BF6E8
 
   addrs["oob_state::shared::flags"] = start + 0x297E48
 
@@ -382,6 +383,7 @@ GV.zvel = value("Z Momentum", "globals.player.ent.frame->vel.z", FloatType, play
 GV.facingAngle = value("Facing Angle", "globals.player.ent.frame->rot.angle", FloatType, playerEntSafeToRead)
 GV.camAngle = value("Camera angle", "globals.camera.yaw_cur", FloatType)
 GV.hansState = value("Hans State", "oob_state::shared::flags", SIntType)
+GV.jumpPower = value("Jump Power", "jumpPower", FloatType)
 GV.hansStateStr = simplevalue("Hans State", HansStateStrValue)
 GV.buttonPressed = value("Pressed", "globals.pad0->pressed", UIntType)
 GV.buttonReleased = value("Released", "globals.pad0->released", UIntType)
@@ -416,7 +418,7 @@ function VVelocityImage:init(window, game, options)
   options = options or {}
   options.max = options.max or 15
   options.square = options.square or true
-  options.sizex = 20
+  options.sizex = options.sizex or 20
 
   layoutsModule.StickInputImage.init(self, window, game.zero, game.yvel, options)
 end

@@ -73,14 +73,14 @@ function InputDisplay:init(window, style, buttonBits, mainStickX, mainStickY, cS
 	self.shoulderImages = {}
 
 	for n, shoulder in pairs(self.shoulders) do
-		self.shoulderImages[n] = createPicture()
-		local uiObj2 = createImage(window)
-		uiObj2:setSize(shoulder.Size[1], shoulder.Size[2])
-		local canvas = uiObj2:getCanvas()
-		canvas:getBrush():setColor(shoulder.Color)
-		canvas:getPen():setColor(shoulder.Color)
-		canvas:rect(0,0,shoulder.Size[1],shoulder.Size[2])
-		self:addElement(shoulder.Pos, uiObj2)
+		-- self.shoulderImages[n] = createPicture()
+		-- local uiObj2 = createImage(window)
+		-- uiObj2:setSize(shoulder.Size[1], shoulder.Size[2])
+		-- local canvas = uiObj2:getCanvas()
+		-- canvas:getBrush():setColor(shoulder.Color)
+		-- canvas:getPen():setColor(shoulder.Color)
+		-- canvas:rect(0,0,shoulder.Size[1],shoulder.Size[2])
+		-- self:addElement(shoulder.Pos, uiObj2)
 	end
 
 end
