@@ -184,19 +184,6 @@ function layouts.render:init()
   local textFontSize = 23
   local layoutScale = 1.7
 
-  -- change to false to prevent screenshots from being taken
-  self.dumpFrames = true
-
-  --------------------------------------------------
-  -- ADJUST ME!
-  --------------------------------------------------
-  -- The following to lines should read like this:
-  -- self.nirCmd = "C:\\path\\to\\nirCmd\\nircmd.exe"
-  -- self.imgOut = "C:\\path\\to\\frames"
-  self.nirCmd = nil
-  self.imgOut = nil
-  --------------------------------------------------
-
   self:addLabel{x=10*layoutScale, y=10*layoutScale, fontSize=labelFontSize}
   self:addItem("Collectables")
   self:addLabel{x=20*layoutScale, y=40*layoutScale, fontSize=textFontSize}
@@ -267,18 +254,23 @@ end
 
 function layouts.render:update()
   Layout.update(self)
-  if self.dumpFrames == nil or not self.dumpFrames then return end
-
-  if self.nirCmd == nil then
-    error("Please specify path to nircmd.exe within the 'render' layout definition (should be around line 191)")
+  if RenderOptions == nil or
+      RenderOptions.dumpFrames == nil or
+      not RenderOptions.dumpFrames then
+    print("debug")
+    return
   end
-  if self.imgOut == nil then
-    error("Please specify path to save screenshots to within the 'render' layout definition (should be around line 191)")
+
+  if RenderOptions.nirCmdDirectory == nil or string.len(RenderOptions.nirCmdDirectory) == 0 then
+    error("Please specify nirCmdDirectory path (ending with nircmd.exe)")
+  end
+  if RenderOptions.imgOutDirectory == nil or string.len(RenderOptions.imgOutDirectory) == 0 then
+    error("Please specify imgOutDirectory path to save screenshots to")
   end
 
   local imgOut = string.format("frame%015d.png", self.game:getFrameCount() - 1)
-  local imgOut = "\"" .. self.imgOut .. "\\" .. imgOut .. "\""
-  local cmd = "\"" .. self.nirCmd .. "\"" .. " savescreenshot " .. imgOut
+  local imgOut = "\"" .. RenderOptions.imgOutDirectory .. "\\" .. imgOut .. "\""
+  local cmd = "\"" .. RenderOptions.nirCmdDirectory .. "\"" .. " savescreenshotfull " .. imgOut
 
   os.execute("\"" .. cmd .. "\"")
 end
