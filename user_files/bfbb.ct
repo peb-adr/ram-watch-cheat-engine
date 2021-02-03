@@ -11,7 +11,7 @@ RWCEOptions = {
 
   -- Addresses for Dolphin 4.0-3964
   frameCounterAddress = 0x00F47890,
-  oncePerFrameAddress = 0x004E05CC,
+  oncePerFrameAddress = 0x004E05CC
 }
 
 RenderOptions = {
