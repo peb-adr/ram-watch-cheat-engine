@@ -141,59 +141,59 @@ function InputDisplay:update()
 		self.elements[#self.buttonImages+1+n].uiObj.setPosition(analogPositions[n][1], analogPositions[n][2])
 	end
 
-	local shoulderValues = {0, 0}
+	-- local shoulderValues = {0, 0}
 
-	if self.shoulders[1].Direction == 'left' or self.shoulders[1].Direction == 'right' then
-		shoulderValues[1] = self.lShoulder:get() * self.shoulders[1].Size[1] / 255
-	else
-		shoulderValues[1] = self.lShoulder:get() * self.shoulders[1].Size[2] / 255
-	end
+	-- if self.shoulders[1].Direction == 'left' or self.shoulders[1].Direction == 'right' then
+	-- 	shoulderValues[1] = self.lShoulder:get() * self.shoulders[1].Size[1] / 255
+	-- else
+	-- 	shoulderValues[1] = self.lShoulder:get() * self.shoulders[1].Size[2] / 255
+	-- end
 
-	if self.shoulders[2].Direction == 'left' or self.shoulders[2].Direction == 'right' then
-		shoulderValues[2] = self.rShoulder:get() * self.shoulders[2].Size[1] / 255
-	else
-		shoulderValues[2] = self.rShoulder:get() * self.shoulders[2].Size[2] / 255
-	end
+	-- if self.shoulders[2].Direction == 'left' or self.shoulders[2].Direction == 'right' then
+	-- 	shoulderValues[2] = self.rShoulder:get() * self.shoulders[2].Size[1] / 255
+	-- else
+	-- 	shoulderValues[2] = self.rShoulder:get() * self.shoulders[2].Size[2] / 255
+	-- end
 
-	for n, shoulder in pairs(self.shoulders) do
-		if shoulder.Direction == 'right' then
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
-				self:getLeft() + shoulder.Pos[1],
-				self:getTop() + shoulder.Pos[2]
-			)
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
-				shoulderValues[n],
-				shoulder.Size[2]
-			)
-		elseif shoulder.Direction == 'left' then
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
-				self:getLeft() + shoulder.Pos[1] + shoulder.Size[1] - shoulderValues[n],
-				self:getTop() + shoulder.Pos[2]
-			)
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
-				shoulderValues[n], 
-				shoulder.Size[2]
-			)
-		elseif shoulder.Direction == 'down' then
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
-				self:getLeft() + shoulder.Pos[1],
-				self:getTop() + shoulder.Pos[2]
-			)
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
-				shoulder.Size[1],
-				shoulderValues[n]
-			)
-		elseif shoulder.Direction == 'up' then
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
-				self:getLeft() + shoulder.Pos[1],
-				self:getTop() + shoulder.Pos[2] + shoulder.Size[2] - shoulderValues[n]
-			)
-			self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
-				shoulder.Size[1],
-				shoulderValues[n]
-			)
-		end
-	end
+	-- for n, shoulder in pairs(self.shoulders) do
+	-- 	if shoulder.Direction == 'right' then
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
+	-- 			self:getLeft() + shoulder.Pos[1],
+	-- 			self:getTop() + shoulder.Pos[2]
+	-- 		)
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
+	-- 			shoulderValues[n],
+	-- 			shoulder.Size[2]
+	-- 		)
+	-- 	elseif shoulder.Direction == 'left' then
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
+	-- 			self:getLeft() + shoulder.Pos[1] + shoulder.Size[1] - shoulderValues[n],
+	-- 			self:getTop() + shoulder.Pos[2]
+	-- 		)
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
+	-- 			shoulderValues[n], 
+	-- 			shoulder.Size[2]
+	-- 		)
+	-- 	elseif shoulder.Direction == 'down' then
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
+	-- 			self:getLeft() + shoulder.Pos[1],
+	-- 			self:getTop() + shoulder.Pos[2]
+	-- 		)
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
+	-- 			shoulder.Size[1],
+	-- 			shoulderValues[n]
+	-- 		)
+	-- 	elseif shoulder.Direction == 'up' then
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setPosition(
+	-- 			self:getLeft() + shoulder.Pos[1],
+	-- 			self:getTop() + shoulder.Pos[2] + shoulder.Size[2] - shoulderValues[n]
+	-- 		)
+	-- 		self.elements[#self.buttonImages+#self.analogImages+1+n].uiObj.setSize(
+	-- 			shoulder.Size[1],
+	-- 			shoulderValues[n]
+	-- 		)
+	-- 	end
+	-- end
 end
 
 return {
