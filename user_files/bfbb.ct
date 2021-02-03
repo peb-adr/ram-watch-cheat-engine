@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="34">
+  <CheatEntries/>
+  <UserdefinedSymbols/>
+  <LuaScript>RWCEMainDirectory = [[C:\path\to\ram-watch-cheat-engine]]
+
+RWCEOptions = {
+  gameModuleName = 'bfbb',
+  gameVersion = 'na',
+  layoutName = 'mono',
+
+  -- Addresses for Dolphin 4.0-3964
+  frameCounterAddress = 0x00F47890,
+  oncePerFrameAddress = 0x004E05CC,
+}
+
+RenderOptions = {
+  dumpFrames = false,
+  nirCmdDirectory = [[C:\path\to\nircmd.exe]],
+  imgOutDirectory = [[C:\path\to\frames]]
+}
+
+local loaderFile, errorMessage = loadfile(RWCEMainDirectory .. '/loader.lua')
+if errorMessage then error(errorMessage) end
+loaderFile()
+</LuaScript>
+</CheatTable>
