@@ -320,9 +320,11 @@ function HansStateStrValue:updateValue()
   v = self.game.hansState:get()
   s = tostring(v)
   if v == 3 then
-    s = "Enabled (" .. s .. ")"
+    s = "Enabled"
+    -- s = "Enabled (" .. s .. ")"
   elseif v == 7 then
-    s = "Disabled (" .. s .. ")"
+    s = "Disabled"
+    -- s = "Disabled (" .. s .. ")"
   end
   self.value = s
 end
@@ -368,7 +370,7 @@ end
 
 local GV = BFBB.blockValues
 GV.health = value("Health", "globals.player.Health", UIntType)
-GV.bowlingState = value("Bowling State", "globals.player.IsBubbleBowling", SIntType)
+GV.bowlingState = value("Bowl State", "globals.player.IsBubbleBowling", SIntType)
 GV.bowlingSpeed = value("Bowl Speed", "globals.player.bbowlInitVel", FloatType)
 GV.bowlingDamp = value("Bowl Dampen", "sBubbleBowlTimer", FloatType)
 GV.shinyObjects = value("Shiny Objects", "globals.player.Inv_Shiny", UIntType)
