@@ -257,7 +257,6 @@ function layouts.render:update()
   if RenderOptions == nil or
       RenderOptions.dumpFrames == nil or
       not RenderOptions.dumpFrames then
-    print("debug")
     return
   end
 
