@@ -67,7 +67,7 @@ Unfortunately the command prompt will always flash on every screenshot. If this 
 If you reached the end of the movie you will now have to pack the screenshots into a video. To do so follow these steps:
 1. copy and paste the `pack_frames.bat` script included in the `user_files` directory into the screenshot folder
 1. copy and paste the `ffmpeg.exe` file from `downloadpath\bin` into the screenshot folder
-3. execute it and follow the instructions
+3. execute `pack_frames.bat` and follow the instructions
 
 Congratz! you can go ahead and edit your video now (:
 
