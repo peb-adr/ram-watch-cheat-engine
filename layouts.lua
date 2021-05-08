@@ -364,6 +364,7 @@ function StickInputImage:init(window, stickX, stickY, options)
   options = options or {}
   -- Line color; default = black
   local foregroundColor = options.foregroundColor or 0x000000
+  local backgroundColor = options.backgroundColor or 0xF0F0F0
   -- Size of the image
   self.sizex = options.sizex or options.size or 100
   self.sizey = options.sizey or options.size or 100
@@ -384,7 +385,7 @@ function StickInputImage:init(window, stickX, stickY, options)
 
   self.canvas = self.uiObj:getCanvas()
   -- Brush: ellipse/rect fill
-  self.canvas:getBrush():setColor(0xF0F0F0)
+  self.canvas:getBrush():setColor(backgroundColor)
   -- Pen: ellipse/rect outline, line()
   self.canvas:getPen():setColor(foregroundColor)
   self.canvas:getPen():setWidth(self.lineThickness)
