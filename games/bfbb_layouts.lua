@@ -169,9 +169,31 @@ function layouts.mono:init()
       {x=10, y=645})
 end
 
+local RenderLayout = subclass(Layout)
+function RenderLayout:update()
+  Layout.update(self)
+  if RenderOptions == nil or
+      RenderOptions.dumpFrames == nil or
+      not RenderOptions.dumpFrames then
+    return
+  end
+
+  if RenderOptions.nirCmdDirectory == nil or string.len(RenderOptions.nirCmdDirectory) == 0 then
+    error("Please specify nirCmdDirectory path (ending with nircmd.exe)")
+  end
+  if RenderOptions.imgOutDirectory == nil or string.len(RenderOptions.imgOutDirectory) == 0 then
+    error("Please specify imgOutDirectory path to save screenshots to")
+  end
+
+  local imgOut = string.format("frame%015d.png", self.game:getFrameCount() - 1)
+  local imgOut = "\"" .. RenderOptions.imgOutDirectory .. "\\" .. imgOut .. "\""
+  local cmd = "\"" .. RenderOptions.nirCmdDirectory .. "\"" .. " savescreenshotfull " .. imgOut
+
+  os.execute("\"" .. cmd .. "\"")
+end
 
 
-layouts.render = subclass(Layout)
+layouts.render = subclass(RenderLayout)
 function layouts.render:init()
   self:setBreakpointUpdateMethod()
   --self:activateAutoPositioningY()
@@ -250,28 +272,6 @@ function layouts.render:init()
       },
       {x=710, y=0})
 
-end
-
-function layouts.render:update()
-  Layout.update(self)
-  if RenderOptions == nil or
-      RenderOptions.dumpFrames == nil or
-      not RenderOptions.dumpFrames then
-    return
-  end
-
-  if RenderOptions.nirCmdDirectory == nil or string.len(RenderOptions.nirCmdDirectory) == 0 then
-    error("Please specify nirCmdDirectory path (ending with nircmd.exe)")
-  end
-  if RenderOptions.imgOutDirectory == nil or string.len(RenderOptions.imgOutDirectory) == 0 then
-    error("Please specify imgOutDirectory path to save screenshots to")
-  end
-
-  local imgOut = string.format("frame%015d.png", self.game:getFrameCount() - 1)
-  local imgOut = "\"" .. RenderOptions.imgOutDirectory .. "\\" .. imgOut .. "\""
-  local cmd = "\"" .. RenderOptions.nirCmdDirectory .. "\"" .. " savescreenshotfull " .. imgOut
-
-  os.execute("\"" .. cmd .. "\"")
 end
 
 return {
