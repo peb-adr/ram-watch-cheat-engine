@@ -22,6 +22,7 @@ Available layouts include
 - `'normal'` - the initial layout style skyweiss used
 - `'mono'` - a more streamlined version of the normal layout using a monospaced font and horizontally alligning memory values
 - `'render'` - an upscaled version of the mono layout for better quality when rendering videos
+- `'spongeboy'` - the render layout using the 'Spongeboy Me Bob' font and greenscreen'd for easier post editing
 
 Layouts are defined in `games\bfbb_layouts.lua`. Here you can adjust positioning and other parameters of the components.
 
