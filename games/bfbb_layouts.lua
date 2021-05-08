@@ -274,6 +274,150 @@ function layouts.render:init()
 
 end
 
+
+layouts.spongeboy = subclass(RenderLayout)
+function layouts.spongeboy:init()
+  TableAddFont(RWCEMainDirectory .. "\\fonts\\Spongeboy Me Bob.ttf")
+  TableAddFont(RWCEMainDirectory .. "\\fonts\\Some Time Later.otf")
+  self:setBreakpointUpdateMethod()
+  --self:activateAutoPositioningY()
+  self.window:setSize(1700, 1050)
+  self.labelDefaults = {fontName="Spongeboy Me Bob", foregroundColor=0xFFFFFF}
+  -- self.labelDefaults = {fontName="Some Time Later", foregroundColor=0xFFFFFF}
+  -- self.labelDefaults = {fontName="Consolas"}
+
+  local game = self.game
+  -- game:setLabelPadding(14)
+  local labelPadding = 155
+  local labelFontSize = 30
+  local textFontSize = 23
+  local layoutScale = 1.7
+  local foregroundColor = 0xFFFFFF
+  local backgroundColor = 0x00FF00
+
+  self.window:setColor(backgroundColor)
+
+  self:addLabel{x=10*layoutScale, y=10*layoutScale, fontSize=labelFontSize, fontColor=foregroundColor}
+  self:addItem("Collectables")
+  self:addLabel{x=20*layoutScale, y=40*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Spatulas")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=40*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.spatulas, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=60*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Shiny Objects")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=60*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.shinyObjects, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=80*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Socks")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=80*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.socks, {nolabel=true})
+
+  self:addLabel{x=10*layoutScale, y=110*layoutScale, fontSize=labelFontSize, fontColor=foregroundColor}
+  self:addItem("Position")
+  self:addLabel{x=20*layoutScale, y=140*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("X Position")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=140*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.xpos, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=160*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Y Position")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=160*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.ypos, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=180*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Z Position")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=180*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.zpos, {nolabel=true})
+
+  self:addLabel{x=10*layoutScale, y=210*layoutScale, fontSize=labelFontSize, fontColor=foregroundColor}
+  self:addItem("Momentum")
+  
+  self:addLabel{x=25*layoutScale, y=240*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Horizontal")
+  self:addLabel{x=149*layoutScale, y=240*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Vertical")
+  self:addLabel{x=27*layoutScale, y=370*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.hvelLength, {nolabel=true})
+  self:addLabel{x=142*layoutScale, y=370*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.vvelLength, {nolabel=true})
+
+  self:addLabel{x=10*layoutScale, y=395*layoutScale, fontSize=labelFontSize, fontColor=foregroundColor}
+  self:addItem("Bowling")
+  self:addLabel{x=20*layoutScale, y=425*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Bowl State")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=425*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.bowlingState, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=445*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Bowl Speed")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=445*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.bowlingSpeed, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=465*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Bowl Damp")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=465*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.bowlingDamp, {nolabel=true})
+
+  self:addLabel{x=10*layoutScale, y=495*layoutScale, fontSize=labelFontSize, fontColor=foregroundColor}
+  self:addItem("Player")
+  self:addLabel{x=20*layoutScale, y=525*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Health")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=525*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.health, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=545*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Facing Angle")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=545*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.facingAngle, {nolabel=true})
+  self:addLabel{x=20*layoutScale, y=565*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem("Hans State")
+  self:addLabel{x=(20 + labelPadding)*layoutScale, y=565*layoutScale, fontSize=textFontSize, fontColor=foregroundColor}
+  self:addItem(game.hansStateStr, {nolabel=true})
+
+  self:addLabel()
+  -- Momentum Vectors: to adjust scaling change max - vector will scale in range(0, max)
+  self:addImage(self.game.HVelocityImage, {game}, {max=11.5, lineThickness=3, foregroundColor=foregroundColor, backgroundColor=backgroundColor, x=20*layoutScale, y=265*layoutScale, size=100*layoutScale})
+  self:addImage(self.game.VVelocityImage, {game}, {max=11.5, lineThickness=3, foregroundColor=foregroundColor, backgroundColor=backgroundColor, x=175*layoutScale, y=265*layoutScale, sizex=20*layoutScale, sizey=100*layoutScale})
+  
+  self:addImage(InputDisplay,
+      {"TronStyleNoDpadUpscaled",
+        self.game.buttonBits,
+        self.game.stickX,
+        self.game.stickY,
+        self.game.xCStick,
+        self.game.yCStick,
+        self.game.lShoulder,
+        self.game.rShoulder
+      },
+      {x=710, y=0})
+
+end
+
+function TableAddFont(path)
+   if (type(path)=='string') then
+      local font,filename
+      font = findTableFile(path);
+      if (not font) then
+         local file = io.open(path,"r")
+         if (not file) then
+            error("ERROR loading font");
+         else
+            file:close();
+            filename = path:match(".+\\(.-)$")
+            font = findTableFile(filename)
+            if (not font) then
+               font = createTableFile(filename,path)
+            end
+         end
+      end
+      local frmt = (cheatEngineIs64Bit() and "mov edx,#%%d\nmov rcx,#%%d\nxor r8d,r8d\nlea r9d,[count]\ncall AddFontMemResourceEx\nmov [handle],rax" or "lea eax,[count]\npush eax\npush 0\npush #%%d\npush #%%d\ncall AddFontMemResourceEx\nmov [handle],eax")
+      local pFont,length = font.stream.memory,font.stream.size
+      local sAdd = "alloc(script,128)\nalloc(data,32)\nlabel(count)\nlabel(handle)\nregistersymbol(count)\nregistersymbol(handle)\nregistersymbol(script)\nscript:\n_FORMAT\nret\ndata:\ncount:\ndd -1\nhandle:\ndd -1\ncreatethread(script)"
+      sAdd = sAdd:gsub("_FORMAT",frmt):format(length,pFont)
+      local status = autoAssemble(sAdd,true);
+      if (status) then
+         local handle = readIntegerLocal("handle") or 0;
+         return handle ~= 0
+      end
+      return false;
+   end
+end
+
 return {
   layouts = layouts,
 }
